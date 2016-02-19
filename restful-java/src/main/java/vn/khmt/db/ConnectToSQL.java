@@ -85,30 +85,7 @@ public class ConnectToSQL {
         }
         return null;
     }
-    public String getUser1(int id) {
-        try {
-            String SQL = "SELECT row_to_json(t) FROM public.user t WHERE t.id = " + id + ";";
-            Statement stmt = this.dbConnection.createStatement();
-            ResultSet rs = stmt.executeQuery(SQL);
-
-            // Iterate through the data in the result set and display it.  
-            if (rs.next()) {
-                System.out.println("User exists");
-                return rs.getString(1);
-            }
-        } catch (SQLException sqle) {
-            System.err.println(sqle.getMessage());
-        } finally {
-            if (this.dbConnection != null) {
-                try {
-                    this.dbConnection.close();
-                } catch (SQLException sqle) {
-                    System.err.println(sqle.getMessage());
-                }
-            }
-        }
-        return null;
-    }
+    
     public ArrayList<User> getAllUsers() {
         try {
             String SQL = "SELECT * FROM public.user;";
