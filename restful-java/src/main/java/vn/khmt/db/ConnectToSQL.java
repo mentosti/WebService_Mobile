@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import vn.khmt.restful.User;
 
 /**
  *
@@ -52,7 +54,38 @@ public class ConnectToSQL {
         return dbConnection;
     }
     
-    public String getUser(int id) {
+    public User getUser(int id) {
+        try {
+            String SQL = "SELECT * FROM public.user t WHERE t.id = " + id + ";";
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+
+            // Iterate through the data in the result set and display it.  
+            if (rs.next()) {
+                System.out.println("User exists");
+                User u = new User();
+                u.setId(rs.getInt(1));
+                u.setUsername(rs.getString(2));
+                u.setPassword(rs.getString(3));
+                u.setEmail(rs.getString(4));
+                u.setStatus(rs.getInt(5));
+                u.setName(rs.getString(6));
+                return u;
+            }
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+    public String getUser1(int id) {
         try {
             String SQL = "SELECT row_to_json(t) FROM public.user t WHERE t.id = " + id + ";";
             Statement stmt = this.dbConnection.createStatement();
@@ -76,16 +109,50 @@ public class ConnectToSQL {
         }
         return null;
     }
-
-    public String addUser(String username, String password, String email, String name) {
+    public ArrayList<User> getAllUsers() {
+        try {
+            String SQL = "SELECT * FROM public.user;";
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+            ArrayList<User> us = new ArrayList<User>();
+            // Iterate through the data in the result set and display it.  
+            while (rs.next()) {
+                //System.out.println("User exists");
+                User u = new User();
+                u.setId(rs.getInt(1));
+                u.setUsername(rs.getString(2));
+                u.setPassword(rs.getString(3));
+                u.setEmail(rs.getString(4));
+                u.setStatus(rs.getInt(5));
+                u.setName(rs.getString(6));
+                us.add(u);
+            }
+            return us;
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+    
+    public String addUser(int id, String username, String password, String email, int status, String name) {
         try {
             
-            String check = checkUserExist(username);
-            if (!check.equals(NOTMATCH)) return "Username existed";
+            String check = checkUserExist(username, id);
+            if (!check.equals(NOTMATCH)) return "Existed";
             this.dbConnection.setAutoCommit(false);
             Statement stmt = this.dbConnection.createStatement();
-            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) SELECT MAX(t.id) + 1, '" + username 
-                        + "', '" + password + "', '" + email + "', 1, '" + name + "' FROM public.user t;";
+//            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) SELECT MAX(t.id) + 1, '" + username 
+//                        + "', '" + password + "', '" + email + "', 1, '" + name + "' FROM public.user t;";
+            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) VALUES(" + id + ", '" + username + "', '"
+                            + password + "', '" + email + "', " + status + ", '" + name + "');";
             stmt.executeUpdate(SQL);
             stmt.close();
             this.dbConnection.commit();
@@ -135,7 +202,7 @@ public class ConnectToSQL {
         return null;
     }
     
-    public String checkUserExist(String username) {
+    public String checkUserExist(String username, int id) {
         try {
             if (username != null) {
                 String SQL = "SELECT 1 FROM public.user u WHERE u.username = '" + username + "';";
@@ -146,7 +213,10 @@ public class ConnectToSQL {
                 if (rs.next()) {
                     return "Existed";
                 } else {
-                    return NOTMATCH;
+                    SQL = "SELECT 1 FROM public.user u WHERE u.id = '" + id + "';";
+                    rs = stmt.executeQuery(SQL);
+                    if (rs.next()) return "Existed";
+                    else return NOTMATCH;
                 }
             }
         } catch (SQLException sqle) {
