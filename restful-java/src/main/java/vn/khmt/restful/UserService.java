@@ -54,7 +54,6 @@ public class UserService {
     public Response addUser(User u){
         ConnectToSQL conn = DBConfig.quickConnect();
         String output = conn.addUser(u.getUsername(), u.getPassword(), u.getEmail(), u.getStatus(), u.getName());
-        System.out.println(output);
         return Response.status(200).entity("{\"result\":\""+output+"\"}").build();
     }
     
