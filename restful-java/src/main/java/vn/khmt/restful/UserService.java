@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
@@ -27,22 +26,24 @@ public class UserService {
     public Response getUser(@PathParam("param") String id, @Context HttpHeaders headers){
         ConnectToSQL conn = DBConfig.quickConnect();
         User output = conn.getUser(Integer.parseInt(id));
-        User authenticated = Authenticator.authenticateUser(headers);
+        User authenticated = AuthorizationChecker.checkFromHeaders(headers);
         if (output.getName().equals(authenticated.getName()) || authenticated.getStatus() == DBConfig.ADMIN_STATUS) {
             return Response.status(200).entity(output).build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
         }
-        
+        return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
     }
     
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(){
-        ConnectToSQL conn = DBConfig.quickConnect();
-        ArrayList<User> output = conn.getAllUsers();
-        return Response.status(200).entity(new GenericEntity<ArrayList<User>>(output){}).build();
+    public Response getAllUsers(@Context HttpHeaders headers){
+        User authenticated = AuthorizationChecker.checkFromHeaders(headers);
+        if (authenticated.getStatus() == DBConfig.ADMIN_STATUS) {
+            ConnectToSQL conn = DBConfig.quickConnect();
+            ArrayList<User> output = conn.getAllUsers();
+            return Response.status(200).entity(new GenericEntity<ArrayList<User>>(output){}).build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
     }
     
     @POST

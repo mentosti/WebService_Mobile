@@ -86,6 +86,44 @@ public class ConnectToSQL {
         return null;
     }
     
+    /*
+     *  
+     */
+    public User getUser(String username, String password) {
+        try {
+            String SQL = "SELECT * FROM public.user t WHERE t.username = '" + username + "' AND t.password = '" + password + "';";
+            Statement stmt = this.dbConnection.createStatement();
+            ResultSet rs = stmt.executeQuery(SQL);
+
+            // Iterate through the data in the result set and display it.  
+            if (rs.next()) {
+                System.out.println("User exists");
+                User u = new User();
+                u.setId(rs.getInt(1));
+                u.setUsername(rs.getString(2));
+                u.setPassword(rs.getString(3));
+                u.setEmail(rs.getString(4));
+                u.setStatus(rs.getInt(5));
+                u.setName(rs.getString(6));
+                return u;
+            } else {
+                System.out.println("User not exists");
+                return new User();
+            }
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return null;
+    }
+    
     public ArrayList<User> getAllUsers() {
         try {
             String SQL = "SELECT * FROM public.user;";
@@ -94,7 +132,6 @@ public class ConnectToSQL {
             ArrayList<User> us = new ArrayList<User>();
             // Iterate through the data in the result set and display it.  
             while (rs.next()) {
-                //System.out.println("User exists");
                 User u = new User();
                 u.setId(rs.getInt(1));
                 u.setUsername(rs.getString(2));
