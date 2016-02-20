@@ -126,7 +126,7 @@ public class ConnectToSQL {
     
     public String changeName(int id, String name) {
         try {
-            String SQL = "UPDATE public.user t SET t.name = '" + name + "' WHERE t.id = " + id + ";";
+            String SQL = "UPDATE public.user SET name = '" + name + "' WHERE id = " + id + ";";
             this.dbConnection.setAutoCommit(false);
             Statement stmt = this.dbConnection.createStatement();
             stmt.executeUpdate(SQL);
@@ -178,17 +178,16 @@ public class ConnectToSQL {
         return null;
     }
     
-    public String addUser(int id, String username, String password, String email, int status, String name) {
+    public String addUser(String username, String password, String email, int status, String name) {
         try {
-            
-            String check = checkUserExist(username, id);
+            String check = checkUserExist(username);
             if (!check.equals(NOTMATCH)) return "Existed";
             this.dbConnection.setAutoCommit(false);
             Statement stmt = this.dbConnection.createStatement();
-//            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) SELECT MAX(t.id) + 1, '" + username 
-//                        + "', '" + password + "', '" + email + "', 1, '" + name + "' FROM public.user t;";
-            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) VALUES(" + id + ", '" + username + "', '"
-                            + password + "', '" + email + "', " + status + ", '" + name + "');";
+            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) SELECT MAX(t.id) + 1, '" + username 
+                        + "', '" + password + "', '" + email + "', " + status + ", '" + name + "' FROM public.user t;";
+//            String SQL = "INSERT INTO public.user(id, username, password, email, status, name) VALUES(" + id + ", '" + username + "', '"
+//                            + password + "', '" + email + "', " + status + ", '" + name + "');";
             stmt.executeUpdate(SQL);
             stmt.close();
             this.dbConnection.commit();
@@ -238,7 +237,7 @@ public class ConnectToSQL {
         return null;
     }
     
-    public String checkUserExist(String username, int id) {
+    public String checkUserExist(String username) {
         try {
             if (username != null) {
                 String SQL = "SELECT 1 FROM public.user u WHERE u.username = '" + username + "';";
@@ -249,10 +248,7 @@ public class ConnectToSQL {
                 if (rs.next()) {
                     return "Existed";
                 } else {
-                    SQL = "SELECT 1 FROM public.user u WHERE u.id = '" + id + "';";
-                    rs = stmt.executeQuery(SQL);
-                    if (rs.next()) return "Existed";
-                    else return NOTMATCH;
+                    return NOTMATCH;
                 }
             }
         } catch (SQLException sqle) {
