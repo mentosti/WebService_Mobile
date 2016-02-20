@@ -6,6 +6,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -49,9 +50,27 @@ public class UserService {
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response addUser(User u){
         ConnectToSQL conn = DBConfig.quickConnect();
         String output = conn.addUser(u.getUsername(), u.getPassword(), u.getEmail(), u.getStatus(), u.getName());
-        return Response.status(200).entity(output).build();
+        System.out.println(output);
+        return Response.status(200).entity("{\"result\":\""+output+"\"}").build();
+    }
+    
+    @PUT
+    @Path("/rename")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changeName(User u, @Context HttpHeaders headers){
+        System.out.println(u.getUsername() + " " + u.getName());
+        User authenticated = AuthorizationChecker.checkFromHeaders(headers);
+        ConnectToSQL conn = DBConfig.quickConnect();
+        if (authenticated.getUsername().equals(u.getUsername())) {
+            String output = conn.renameUser(authenticated.getId(), u.getName());
+            System.out.println(output);
+            return Response.status(200).entity("{\"result\":\""+output+"\"}").build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
     }
 }

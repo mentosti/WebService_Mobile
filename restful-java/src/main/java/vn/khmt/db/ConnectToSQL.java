@@ -124,7 +124,7 @@ public class ConnectToSQL {
         return null;
     }
     
-    public String changeName(int id, String name) {
+    public String renameUser(int id, String name) {
         try {
             String SQL = "UPDATE public.user SET name = '" + name + "' WHERE id = " + id + ";";
             this.dbConnection.setAutoCommit(false);
@@ -132,8 +132,10 @@ public class ConnectToSQL {
             stmt.executeUpdate(SQL);
             stmt.close();
             this.dbConnection.commit();
+            return "Success";
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
+            return "Failed";
         } finally {
             if (this.dbConnection != null) {
                 try {
@@ -143,7 +145,6 @@ public class ConnectToSQL {
                 }
             }
         }
-        return "Success";
     }
     
     public ArrayList<User> getAllUsers() {
@@ -191,8 +192,10 @@ public class ConnectToSQL {
             stmt.executeUpdate(SQL);
             stmt.close();
             this.dbConnection.commit();
+            return "Success";
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
+            return "Failed";
         } finally {
             if (this.dbConnection != null) {
                 try {
@@ -202,7 +205,6 @@ public class ConnectToSQL {
                 }
             }
         }
-        return "Success";
     }
     
     public String checkUser(String username, String password) {
