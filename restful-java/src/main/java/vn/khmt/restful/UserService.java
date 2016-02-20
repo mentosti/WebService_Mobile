@@ -20,25 +20,27 @@ import vn.khmt.db.ConnectToSQL;
  * @author TheNhan
  */
 @Path("user")
-public class UserService {
-
+public class UserService {    
     @GET
     @Path("/{param}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUser(@PathParam("param") String id, @Context HttpHeaders headers){
-        System.out.println("Get User");
-        String authenticationHeader = headers.getRequestHeader("authentication").get(0);
-        System.out.println("Authentication header = " + authenticationHeader);
-        ConnectToSQL conn = new ConnectToSQL("POSTGRESQL", "ec2-54-227-253-228.compute-1.amazonaws.com:5432", "d8viikojj42e3b", "uzufecmqojhnyx", "WPJGueUbd3npLKslU2BEUOmMHx");
+        ConnectToSQL conn = DBConfig.quickConnect();
         User output = conn.getUser(Integer.parseInt(id));
-        return Response.status(200).entity(output).build();
+        User authenticated = Authenticator.authenticateUser(headers);
+        if (output.getName().equals(authenticated.getName()) || authenticated.getStatus() == DBConfig.ADMIN_STATUS) {
+            return Response.status(200).entity(output).build();
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
+        }
+        
     }
     
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(){
-        ConnectToSQL conn = new ConnectToSQL("POSTGRESQL", "ec2-54-227-253-228.compute-1.amazonaws.com:5432", "d8viikojj42e3b", "uzufecmqojhnyx", "WPJGueUbd3npLKslU2BEUOmMHx");
+        ConnectToSQL conn = DBConfig.quickConnect();
         ArrayList<User> output = conn.getAllUsers();
         return Response.status(200).entity(new GenericEntity<ArrayList<User>>(output){}).build();
     }
@@ -47,7 +49,7 @@ public class UserService {
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(User u){
-        ConnectToSQL conn = new ConnectToSQL("POSTGRESQL", "ec2-54-227-253-228.compute-1.amazonaws.com:5432", "d8viikojj42e3b", "uzufecmqojhnyx", "WPJGueUbd3npLKslU2BEUOmMHx");
+        ConnectToSQL conn = DBConfig.quickConnect();
         String output = conn.addUser(u.getId(), u.getUsername(), u.getPassword(), u.getEmail(), u.getStatus(), u.getName());
         System.out.println(output);
         return Response.status(200).entity(output).build();
