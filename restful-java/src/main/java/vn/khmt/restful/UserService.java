@@ -51,7 +51,6 @@ public class UserService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(User u){
         ConnectToSQL conn = DBConfig.quickConnect();
-        System.out.println(u.getUsername());
         String output = conn.addUser(u.getUsername(), u.getPassword(), u.getEmail(), u.getStatus(), u.getName());
         return Response.status(200).entity(output).build();
     }
