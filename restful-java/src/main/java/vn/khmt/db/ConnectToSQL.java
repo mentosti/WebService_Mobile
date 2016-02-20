@@ -124,6 +124,28 @@ public class ConnectToSQL {
         return null;
     }
     
+    public String changeName(int id, String name) {
+        try {
+            String SQL = "UPDATE public.user t SET t.name = '" + name + "' WHERE t.id = " + id + ";";
+            this.dbConnection.setAutoCommit(false);
+            Statement stmt = this.dbConnection.createStatement();
+            stmt.executeUpdate(SQL);
+            stmt.close();
+            this.dbConnection.commit();
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        } finally {
+            if (this.dbConnection != null) {
+                try {
+                    this.dbConnection.close();
+                } catch (SQLException sqle) {
+                    System.err.println(sqle.getMessage());
+                }
+            }
+        }
+        return "Success";
+    }
+    
     public ArrayList<User> getAllUsers() {
         try {
             String SQL = "SELECT * FROM public.user;";
