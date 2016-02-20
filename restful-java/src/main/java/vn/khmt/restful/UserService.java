@@ -27,7 +27,7 @@ public class UserService {
         ConnectToSQL conn = DBConfig.quickConnect();
         User output = conn.getUser(Integer.parseInt(id));
         User authenticated = AuthorizationChecker.checkFromHeaders(headers);
-        if (output.getName().equals(authenticated.getName()) || authenticated.getStatus() == DBConfig.ADMIN_STATUS) {
+        if (output.getUsername().equals(authenticated.getUsername()) || authenticated.getStatus() == DBConfig.ADMIN_STATUS) {
             return Response.status(200).entity(output).build();
         }
         return Response.status(Response.Status.UNAUTHORIZED).entity(null).build();
