@@ -1,5 +1,8 @@
 package vn.khmt.restful;
 
+import vn.khmt.entity.User;
+import vn.khmt.helper.AuthorizationChecker;
+import vn.khmt.helper.DBConfig;
 import java.util.ArrayList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.PathParam;
@@ -20,7 +23,8 @@ import vn.khmt.db.ConnectToSQL;
  * @author TheNhan
  */
 @Path("user")
-public class UserService {    
+public class UserService {  
+    
     @GET
     @Path("/{param}")
     @Produces(MediaType.APPLICATION_JSON)

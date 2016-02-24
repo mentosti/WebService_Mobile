@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import vn.khmt.restful.User;
+import vn.khmt.entity.User;
 
 /**
  *
@@ -152,7 +152,7 @@ public class ConnectToSQL {
             String SQL = "SELECT * FROM public.user;";
             Statement stmt = this.dbConnection.createStatement();
             ResultSet rs = stmt.executeQuery(SQL);
-            ArrayList<User> us = new ArrayList<User>();
+            ArrayList<User> us = new ArrayList<>();
             // Iterate through the data in the result set and display it.  
             while (rs.next()) {
                 User u = new User();

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import vn.khmt.helper.CORSResponseFilter;
 import vn.khmt.restful.HelloService;
 import vn.khmt.restful.UserService;
 /**
@@ -12,10 +13,11 @@ import vn.khmt.restful.UserService;
  */
 @ApplicationPath("")
 public class ApplicationConfig extends Application {
-
+    
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> s = new HashSet<>();
+        s.add(CORSResponseFilter.class);
         s.add(HelloService.class);
         s.add(UserService.class);
         return s;

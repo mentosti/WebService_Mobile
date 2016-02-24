@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vn.khmt.restful;
+package vn.khmt.helper;
 
 import vn.khmt.db.ConnectToSQL;
 

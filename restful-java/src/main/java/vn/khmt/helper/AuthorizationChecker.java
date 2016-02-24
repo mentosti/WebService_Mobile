@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vn.khmt.restful;
+package vn.khmt.helper;
 
+import vn.khmt.entity.User;
 import java.util.Base64;
 import javax.ws.rs.core.HttpHeaders;
 import vn.khmt.db.ConnectToSQL;
@@ -17,10 +18,10 @@ public class AuthorizationChecker {
 
     /**
      * authenticateUser from header string
-     * @param authenticationHeader
+     * @param headers
      * @return authenticated User
      */
-    static User checkFromHeaders(HttpHeaders headers) {
+    public static User checkFromHeaders(HttpHeaders headers) {
         try {
             String authorizationHeader = headers.getRequestHeader("Authorization").get(0);
             authorizationHeader = authorizationHeader.replaceAll("Basic ", "");
